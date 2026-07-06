@@ -18,8 +18,16 @@ from qlib.config import C, QlibConfig
 class ParallelExt(Parallel):
     def __init__(self, *args, **kwargs):
         maxtasksperchild = kwargs.pop("maxtasksperchild", None)
+        if maxtasksperchild is not None:
+            # joblib >= 1.2 accepts `maxtasksperchild` as a backend kwarg directly.
+            kwargs["maxtasksperchild"] = maxtasksperchild
         super(ParallelExt, self).__init__(*args, **kwargs)
-        if isinstance(self._backend, MultiprocessingBackend):
+        # Legacy path: old joblib (< 1.3) stored it in `_backend_args` (removed in >= 1.3).
+        if (
+            maxtasksperchild is not None
+            and hasattr(self, "_backend_args")
+            and isinstance(self._backend, MultiprocessingBackend)
+        ):
             self._backend_args["maxtasksperchild"] = maxtasksperchild
 
 
