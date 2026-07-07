@@ -86,7 +86,7 @@ class FeaInfAna(NumFeaAnalyser):
         self._inf_cnt = {}
         for col, item in self._dataset.items():
             if not super().skip(col):
-                self._inf_cnt[col] = item.apply(np.isinf).astype(np.int).groupby(DT_COL_NAME).sum()
+                self._inf_cnt[col] = item.apply(np.isinf).astype(int).groupby(DT_COL_NAME).sum()
         self._inf_cnt = pd.DataFrame(self._inf_cnt)
 
     def skip(self, col):
