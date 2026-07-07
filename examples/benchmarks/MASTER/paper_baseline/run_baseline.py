@@ -54,7 +54,8 @@ def parse_args():
     p = argparse.ArgumentParser(description="MASTER baseline runner (CSI300 / SP500)")
     p.add_argument("--market", choices=list(_MARKET_CONFIG), default="csi300")
     p.add_argument("--config", default=None, help="override config filename (in this dir)")
-    p.add_argument("--seeds", type=int, default=5, help="number of seeds (0 .. N-1)")
+    p.add_argument("--seeds", type=int, default=5, help="number of seeds (range: seed_start..seed_start+seeds-1)")
+    p.add_argument("--seed-start", type=int, default=0, help="first seed (inclusive); use 1 to skip an already-run seed 0")
     p.add_argument("--only_backtest", action="store_true", help="load saved model, skip training")
     p.add_argument("--smoke", action="store_true", help="1 epoch, seed 0 only (pipeline check)")
     return p.parse_args()
@@ -78,7 +79,8 @@ def main():
         seeds = [0]
         print("[SMOKE] n_epochs=1, seeds=[0]  (pipeline check only)")
     else:
-        seeds = list(range(args.seeds))
+        seeds = list(range(args.seed_start, args.seed_start + args.seeds))
+        print(f"seeds: {seeds}")
 
     # Cache the preprocessed handler so all seeds share it. The filename is derived from the
     # segment dates via .strftime(), so the yaml dates MUST stay unquoted (datetime.date).
