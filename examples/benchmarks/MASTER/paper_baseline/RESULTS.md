@@ -9,7 +9,7 @@ Paper baseline for the **MASTER** model — *Market-Guided Stock Transformer for
 | Model | MASTER (default architecture: `d_feat=158, d_model=256, t_nhead=4, s_nhead=2, dropout=0.5, n_epochs=40, lr=8e-6, train_stop_loss_thred=0.95`) |
 | Markets | A-share **CSI300** (region `cn`, `~/.qlib/qlib_data/cn_data`) · US **SP500** (region `us`, `~/.qlib/qlib_data/us_data`) |
 | Stock features | Alpha158 (158 factors). CSI300 → stock `Alpha158`; SP500 → `Alpha158US` (`$vwap`→typical-price proxy, since us_data has no `$vwap`) |
-| Market-guided gate | 63 market features from 3 indices: CSI300 → `sh000300/sh000903/sh000905`; SP500 → `^gspc/^dji/^ndx` (architecture unchanged) |
+| Market-guided gate | 63 market features from 3 indices: CSI300 → `sh000300/sh000852/sh000905` (沪深300/中证1000/中证500 — 中证1000 `sh000852` substitutes the locally-absent 中证100 `sh000903`, see §5); SP500 → `^gspc/^dji/^ndx` (architecture unchanged) |
 | Label | `Ref($close,-5)/Ref($close,-1)-1` (5-day forward return) — both markets |
 | Split | train `2009-01-01 ~ 2020-12-31` · valid `2021-01-01 ~ 2022-12-31` · test `2023-01-01 ~ 2025-12-31` |
 | Strategy | Qlib `TopkDropoutStrategy` (`topk=30, n_drop=5`); benchmark `SH000300` / `^gspc` |
@@ -20,16 +20,20 @@ Paper baseline for the **MASTER** model — *Market-Guided Stock Transformer for
 ## 2. Results — 5 seeds, test 2023-01-01 ~ 2025-12-31 (mean ± std)
 
 ### CSI300 🇨🇳
+*Market gate uses `sh000300/sh000852/sh000905` (中证1000 replaces the locally-absent 中证100 `sh000903`; see §5). Re-run 2026-07-09.*
+
 | Metric | mean ± std | per-seed (0..4) |
 |---|---|---|
-| IC | **0.0402 ± 0.0068** | 0.0498, 0.0465, 0.0377, 0.0338, 0.0330 |
-| Rank IC | **0.0618 ± 0.0069** | 0.0715, 0.0676, 0.0606, 0.0557, 0.0535 |
-| ICIR | 0.2186 ± 0.0383 | |
-| Rank ICIR | 0.3393 ± 0.0351 | |
-| Annualized excess return (with cost) | **+12.27% ± 2.21%** | 15.38, 9.97, 13.48, 13.01, 9.53 |
-| Annualized excess return (without cost) | +13.94% ± 2.22% | 17.05, 11.62, 15.17, 14.68, 11.19 |
-| Information ratio (with cost) | 0.657 ± 0.118 | |
-| Information ratio (without cost) | 0.745 ± 0.118 | |
+| IC | **0.0406 ± 0.0070** | 0.0505, 0.0467, 0.0388, 0.0335, 0.0333 |
+| Rank IC | **0.0621 ± 0.0071** | 0.0720, 0.0681, 0.0616, 0.0552, 0.0538 |
+| ICIR | 0.2200 ± 0.0390 | |
+| Rank ICIR | 0.3389 ± 0.0366 | |
+| Annualized excess return (with cost) | **+11.95% ± 2.62%** | 16.45, 12.15, 10.89, 11.87, 8.37 |
+| Annualized excess return (without cost) | +13.62% ± 2.62% | 18.13, 13.82, 12.59, 13.55, 10.03 |
+| Information ratio (with cost) | 0.644 ± 0.145 | |
+| Information ratio (without cost) | 0.732 ± 0.145 | |
+
+> **Index-substitution note.** An earlier run used `sh000903` (中证100) for the gate's 3rd index, but `sh000903` is **absent from local `cn_data`** → those 21/63 dims were zero-filled (degraded gate, only 42/63 real). That run gave IC 0.0402 / +12.27% — **statistically identical** to the corrected numbers above (per-seed ICs match to ~3 decimals), so MASTER's market gate is near-insensitive to 2 vs 3 correlated CN indices. The degraded-run artifacts (config, 5 checkpoints, mlruns snapshot, 2.4 GB handler cache) are preserved in `examples/benchmarks/MASTER/backup_csi100_baseline/`.
 
 ### SP500 🇺🇸
 | Metric | mean ± std | per-seed (0..4) |
@@ -95,6 +99,7 @@ mlflow ui     # open the printed URL; experiments are named {market}_MASTER_seed
 ## 5. Caveats
 
 - **US adaptation**: MASTER is natively CN-only. SP500 required two backward-compatible changes — `Alpha158US` (no `$vwap` in us_data) and `marketDataHandler.market_indices = [^gspc, ^dji, ^ndx]` (the gate's 3 market indices). Model architecture unchanged (158 stock + 63 market features).
+- **CSI300 gate indices**: the gate's 3 CN indices are `sh000300/sh000852/sh000905`. The paper's original 3rd index `sh000903` (中证100) and `sh000016` (上证50) are both **absent from local `cn_data`**, so 中证1000 (`sh000852`, full 2008–2025 coverage) is used instead. The earlier degraded run (csi100=0, 42/63 real dims) is preserved under `examples/benchmarks/MASTER/backup_csi100_baseline/` and produced statistically identical results (see the CSI300 table note).
 - **Memory (≈15 GB machines)**: running >1 seed in a single python process can OOM on SP500 (~11 GB/seed, RAM accumulates across seeds). `run_baseline.sh full` runs each seed in a fresh process. If you abort a run, clean orphan workers with `pkill -9 -f run_baseline.py`.
 - **Costs**: `open_cost=0.0005`, `close_cost=0.0015` are set in each yaml's `port_analysis_config.backtest.exchange_kwargs`; both `with_cost` and `without_cost` metrics are reported.
 - **Dates must stay unquoted** in the yaml files (`run_baseline.py` builds the handler-cache filename via `.strftime()` on the parsed date).

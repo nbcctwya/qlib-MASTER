@@ -40,6 +40,10 @@ market_data_handler_config: &market_data_handler_config
     fit_start_time: 2009-01-01
     fit_end_time: 2020-12-31
     instruments: *market
+    # 3 个市场宽基指数喂给 MASTER 的 market-guided gate (21 表达式 x 3 = 63 维)。
+    # 本地 cn_data 无中证100(sh000903), 改用中证1000(sh000852); 三指数数据均完整覆盖 2008~2025。
+    # 之前用的是 [sh000300, sh000903, sh000905], 但 sh000903 缺失导致那 21 维被填成 0 —— 见 backup_csi100_baseline/。
+    market_indices: ["sh000300", "sh000852", "sh000905"]   # 沪深300 / 中证1000 / 中证500
     infer_processors:
         - class: RobustZScoreNorm
           kwargs:
