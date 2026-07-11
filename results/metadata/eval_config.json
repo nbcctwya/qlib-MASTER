@@ -1,0 +1,186 @@
+{
+  "schema_version": "1.0",
+  "baseline": "MASTER",
+  "models": [
+    "master"
+  ],
+  "markets": [
+    "csi300",
+    "sp500"
+  ],
+  "seeds": {
+    "sp500": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "csi300": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "periods": {
+    "train": [
+      "2009-01-01",
+      "2020-12-31"
+    ],
+    "valid": [
+      "2021-01-01",
+      "2022-12-31"
+    ],
+    "test": [
+      "2023-01-01",
+      "2025-12-31"
+    ]
+  },
+  "label": "Ref($close, -5) / Ref($close, -1) - 1",
+  "strategy": {
+    "class": "TopkDropoutStrategy",
+    "topk": 30,
+    "n_drop": 5,
+    "weighting": "Qlib TopkDropoutStrategy default"
+  },
+  "market_details": {
+    "csi300": {
+      "benchmark": "SH000300",
+      "stock_pool": "csi300",
+      "transaction_cost": {
+        "limit_threshold": 0.095,
+        "deal_price": "close",
+        "open_cost": 0.0005,
+        "close_cost": 0.0015,
+        "min_cost": 5
+      },
+      "data_provider": "~/.qlib/qlib_data/cn_data",
+      "data_end_date": "2025-12-31",
+      "market_gate_indices": [
+        "sh000300",
+        "sh000852",
+        "sh000905"
+      ]
+    },
+    "sp500": {
+      "benchmark": "^gspc",
+      "stock_pool": "sp500",
+      "transaction_cost": {
+        "limit_threshold": null,
+        "deal_price": "close",
+        "open_cost": 0.0005,
+        "close_cost": 0.0015,
+        "min_cost": 5
+      },
+      "data_provider": "~/.qlib/qlib_data/us_data",
+      "data_end_date": "2025-12-31",
+      "market_gate_indices": [
+        "^gspc",
+        "^dji",
+        "^ndx"
+      ]
+    }
+  },
+  "return_semantics": {
+    "return_field": "report.return",
+    "return_is_gross": true,
+    "cost_field": "report.cost",
+    "net_formula": "report.return - report.cost",
+    "evidence": "qlib/workflow/record_temp.py computes with-cost excess return as report.return - report.bench - report.cost"
+  },
+  "metric_convention": {
+    "annualization": 252,
+    "return_type": "daily simple return converted with log1p",
+    "std_ddof": 1,
+    "risk_free_rate": 0,
+    "MAR_daily": 0,
+    "AR": "exp(mean(log1p(r_net))*252)-1",
+    "STD": "std(log1p(r_net),ddof=1)*sqrt(252)",
+    "MDD": "min([1,exp(cumsum(g))]/cummax-1)",
+    "Sharpe": "sqrt(252)*mean(g)/std(g,ddof=1)",
+    "Sortino": "sqrt(252)*mean(g)/sqrt(mean(min(g,0)^2))",
+    "Calmar": "AR/abs(MDD)",
+    "ICIR_annualized": false
+  },
+  "ensemble": {
+    "enabled": true,
+    "methods": [
+      "avg_none"
+    ],
+    "join": "inner",
+    "normalize": "none",
+    "score_formula": "row-wise mean across aligned seed scores",
+    "ranking_metrics_source": "recomputed from ensemble score and aligned test label",
+    "backtest": "same Qlib strategy, costs, stock pool, and test period as seeds"
+  },
+  "selected_artifacts": {
+    "csi300": {
+      "0": {
+        "run_id": "9a76919e448b499dad1efbbb88ed0e44",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/224505313702429845/9a76919e448b499dad1efbbb88ed0e44/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/224505313702429845/9a76919e448b499dad1efbbb88ed0e44/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/224505313702429845/9a76919e448b499dad1efbbb88ed0e44/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "1": {
+        "run_id": "e4e7469cd27a4a89853fae4b2b30bfc3",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/246370288293499140/e4e7469cd27a4a89853fae4b2b30bfc3/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/246370288293499140/e4e7469cd27a4a89853fae4b2b30bfc3/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/246370288293499140/e4e7469cd27a4a89853fae4b2b30bfc3/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "2": {
+        "run_id": "59ff028ba7404e178785a75d73216187",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/213605115123889733/59ff028ba7404e178785a75d73216187/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/213605115123889733/59ff028ba7404e178785a75d73216187/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/213605115123889733/59ff028ba7404e178785a75d73216187/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "3": {
+        "run_id": "fed8fa72cbdb4d1aa72503b6389eccb0",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/657018618869078768/fed8fa72cbdb4d1aa72503b6389eccb0/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/657018618869078768/fed8fa72cbdb4d1aa72503b6389eccb0/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/657018618869078768/fed8fa72cbdb4d1aa72503b6389eccb0/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "4": {
+        "run_id": "2461fc5711324f92abd4228b2fff0a46",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/692504356880211392/2461fc5711324f92abd4228b2fff0a46/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/692504356880211392/2461fc5711324f92abd4228b2fff0a46/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/692504356880211392/2461fc5711324f92abd4228b2fff0a46/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      }
+    },
+    "sp500": {
+      "0": {
+        "run_id": "a542fefde4624372bd498a66df0b8c15",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/562711993091439480/a542fefde4624372bd498a66df0b8c15/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/562711993091439480/a542fefde4624372bd498a66df0b8c15/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/562711993091439480/a542fefde4624372bd498a66df0b8c15/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "1": {
+        "run_id": "4b07045c0484425380911bfe5a7c561c",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/228113011200315526/4b07045c0484425380911bfe5a7c561c/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/228113011200315526/4b07045c0484425380911bfe5a7c561c/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/228113011200315526/4b07045c0484425380911bfe5a7c561c/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "2": {
+        "run_id": "cb7baa7d464d4fe3adc4f1c5235d4dab",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/610202009334159606/cb7baa7d464d4fe3adc4f1c5235d4dab/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/610202009334159606/cb7baa7d464d4fe3adc4f1c5235d4dab/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/610202009334159606/cb7baa7d464d4fe3adc4f1c5235d4dab/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "3": {
+        "run_id": "7c951938b4394558ac68a202c6b16bad",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/678903798120985225/7c951938b4394558ac68a202c6b16bad/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/678903798120985225/7c951938b4394558ac68a202c6b16bad/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/678903798120985225/7c951938b4394558ac68a202c6b16bad/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      },
+      "4": {
+        "run_id": "d6f094be7d2847d48ba98198401ce65a",
+        "prediction": "examples/benchmarks/MASTER/paper_baseline/mlruns/511312566299574822/d6f094be7d2847d48ba98198401ce65a/artifacts/pred.pkl",
+        "label": "examples/benchmarks/MASTER/paper_baseline/mlruns/511312566299574822/d6f094be7d2847d48ba98198401ce65a/artifacts/label.pkl",
+        "daily_backtest": "examples/benchmarks/MASTER/paper_baseline/mlruns/511312566299574822/d6f094be7d2847d48ba98198401ce65a/artifacts/portfolio_analysis/report_normal_1day.pkl"
+      }
+    }
+  },
+  "run_selection": "latest FINISHED MLflow run with prediction, label, and daily backtest artifacts for each market/seed",
+  "git_commit": "6117797586604d89142e6ffe66158872db5e8bca"
+}

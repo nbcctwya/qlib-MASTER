@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "passes": 24,
+  "failures": 0,
+  "checks": [
+    {
+      "name": "core metadata exists",
+      "passed": true,
+      "detail": "/home/nbcctwya/baselines/qlib-MASTER/results"
+    },
+    {
+      "name": "manifest file: seed_metrics",
+      "passed": true,
+      "detail": "metrics/seed_metrics.csv"
+    },
+    {
+      "name": "manifest file: aggregate_metrics",
+      "passed": true,
+      "detail": "metrics/aggregate_metrics.csv"
+    },
+    {
+      "name": "manifest file: seed_table",
+      "passed": true,
+      "detail": "tables/seed_mean_std.csv"
+    },
+    {
+      "name": "manifest file: eval_config",
+      "passed": true,
+      "detail": "metadata/eval_config.json"
+    },
+    {
+      "name": "manifest file: validation",
+      "passed": true,
+      "detail": "diagnostics/validation.json"
+    },
+    {
+      "name": "manifest file: ensemble_metrics",
+      "passed": true,
+      "detail": "metrics/ensemble_metrics.csv"
+    },
+    {
+      "name": "manifest file: ensemble_table",
+      "passed": true,
+      "detail": "tables/ensemble.csv"
+    },
+    {
+      "name": "seed key coverage",
+      "passed": true,
+      "detail": "expected=[('csi300', 'master', 0), ('csi300', 'master', 1), ('csi300', 'master', 2), ('csi300', 'master', 3), ('csi300', 'master', 4), ('sp500', 'master', 0), ('sp500', 'master', 1), ('sp500', 'master', 2), ('sp500', 'master', 3), ('sp500', 'master', 4)], actual=[('csi300', 'master', 0), ('csi300', 'master', 1), ('csi300', 'master', 2), ('csi300', 'master', 3), ('csi300', 'master', 4), ('sp500', 'master', 0), ('sp500', 'master', 1), ('sp500', 'master', 2), ('sp500', 'master', 3), ('sp500', 'master', 4)]"
+    },
+    {
+      "name": "seed primary key unique",
+      "passed": true,
+      "detail": "rows=10"
+    },
+    {
+      "name": "seed metrics finite",
+      "passed": true,
+      "detail": "no allowed undefined exceptions in this export"
+    },
+    {
+      "name": "seed metric bounds",
+      "passed": true,
+      "detail": "|IC|, |RankIC| <= 1; STD >= 0; MDD <= 0"
+    },
+    {
+      "name": "aggregate recomputation",
+      "passed": true,
+      "detail": "mean/std recomputed with ddof=1"
+    },
+    {
+      "name": "seed table formatting",
+      "passed": true,
+      "detail": "four-decimal mean ± std"
+    },
+    {
+      "name": "ensemble key coverage",
+      "passed": true,
+      "detail": "{('csi300', 'master', 'avg_none'), ('sp500', 'master', 'avg_none')}"
+    },
+    {
+      "name": "ensemble table formatting",
+      "passed": true,
+      "detail": "four-decimal numeric display"
+    },
+    {
+      "name": "csi300 curve dates and values",
+      "passed": true,
+      "detail": "rows=727"
+    },
+    {
+      "name": "csi300 curve accounting",
+      "passed": true,
+      "detail": "net=gross-cost; NAV includes first return"
+    },
+    {
+      "name": "csi300 portfolio metrics",
+      "passed": true,
+      "detail": "recomputed from curve"
+    },
+    {
+      "name": "csi300 ensemble ranking source",
+      "passed": true,
+      "detail": "recomputed from aligned ensemble score and label"
+    },
+    {
+      "name": "sp500 curve dates and values",
+      "passed": true,
+      "detail": "rows=752"
+    },
+    {
+      "name": "sp500 curve accounting",
+      "passed": true,
+      "detail": "net=gross-cost; NAV includes first return"
+    },
+    {
+      "name": "sp500 portfolio metrics",
+      "passed": true,
+      "detail": "recomputed from curve"
+    },
+    {
+      "name": "sp500 ensemble ranking source",
+      "passed": true,
+      "detail": "recomputed from aligned ensemble score and label"
+    }
+  ]
+}
