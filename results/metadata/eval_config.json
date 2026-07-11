@@ -39,24 +39,55 @@
     ]
   },
   "label": "Ref($close, -5) / Ref($close, -1) - 1",
-  "strategy": {
-    "class": "TopkDropoutStrategy",
-    "topk": 30,
-    "n_drop": 5,
-    "weighting": "Qlib TopkDropoutStrategy default"
+  "standard_backtest": {
+    "strategy": {
+      "class": "TopkDropoutStrategy",
+      "module_path": "qlib.contrib.strategy.signal_strategy",
+      "kwargs": {
+        "topk": 30,
+        "n_drop": 5,
+        "method_sell": "bottom",
+        "method_buy": "top",
+        "hold_thresh": 1,
+        "only_tradable": false,
+        "forbid_all_trade_at_limit": true,
+        "risk_degree": 0.95
+      }
+    },
+    "executor": {
+      "class": "SimulatorExecutor",
+      "module_path": "qlib.backtest.executor",
+      "kwargs": {
+        "time_per_step": "day",
+        "generate_portfolio_metrics": true
+      }
+    },
+    "frequency": "day",
+    "account": 100000000,
+    "costs": {
+      "open_cost": 0.0005,
+      "close_cost": 0.0015,
+      "min_cost": 0
+    },
+    "deal_price": "close",
+    "trade_unit": "Qlib region market configuration; not overridden",
+    "positioning": "long-only, no leverage, risk_degree=0.95",
+    "qlib_version": "0.9.3.99",
+    "applies_to": [
+      "seed",
+      "ensemble"
+    ]
   },
   "market_details": {
     "csi300": {
+      "provider_uri": "~/.qlib/qlib_data/cn_data",
+      "region": "cn",
       "benchmark": "SH000300",
       "stock_pool": "csi300",
-      "transaction_cost": {
-        "limit_threshold": 0.095,
-        "deal_price": "close",
-        "open_cost": 0.0005,
-        "close_cost": 0.0015,
-        "min_cost": 5
-      },
-      "data_provider": "~/.qlib/qlib_data/cn_data",
+      "instruments": "Qlib dynamic historical constituents for the configured stock pool",
+      "deal_price": "close",
+      "limit_threshold": 0.095,
+      "untradable_handling": "Qlib Exchange order checks; only_tradable=false for ranking candidates",
       "data_end_date": "2025-12-31",
       "market_gate_indices": [
         "sh000300",
@@ -65,16 +96,14 @@
       ]
     },
     "sp500": {
+      "provider_uri": "~/.qlib/qlib_data/us_data",
+      "region": "us",
       "benchmark": "^gspc",
       "stock_pool": "sp500",
-      "transaction_cost": {
-        "limit_threshold": null,
-        "deal_price": "close",
-        "open_cost": 0.0005,
-        "close_cost": 0.0015,
-        "min_cost": 5
-      },
-      "data_provider": "~/.qlib/qlib_data/us_data",
+      "instruments": "Qlib dynamic historical constituents for the configured stock pool",
+      "deal_price": "close",
+      "limit_threshold": null,
+      "untradable_handling": "Qlib Exchange order checks; only_tradable=false for ranking candidates",
       "data_end_date": "2025-12-31",
       "market_gate_indices": [
         "^gspc",
@@ -82,6 +111,13 @@
         "^ndx"
       ]
     }
+  },
+  "signal_alignment": {
+    "signal_date": "t-1",
+    "trade_date": "t",
+    "qlib_internal_shift": 1,
+    "manual_shift_applied": false,
+    "label_horizon": "5 trading days forward: Ref($close,-5)/Ref($close,-1)-1"
   },
   "return_semantics": {
     "return_field": "report.return",
@@ -181,6 +217,113 @@
       }
     }
   },
+  "prediction_coverage": {
+    "csi300": {
+      "0": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 727,
+        "test_calendar_days": 727,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "1": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 727,
+        "test_calendar_days": 727,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "2": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 727,
+        "test_calendar_days": 727,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "3": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 727,
+        "test_calendar_days": 727,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "4": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 727,
+        "test_calendar_days": 727,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      }
+    },
+    "sp500": {
+      "0": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 752,
+        "test_calendar_days": 752,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "1": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 752,
+        "test_calendar_days": 752,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "2": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 752,
+        "test_calendar_days": 752,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "3": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 752,
+        "test_calendar_days": 752,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      },
+      "4": {
+        "prediction_start": "2023-01-03",
+        "prediction_end": "2025-12-31",
+        "test_calendar_start": "2023-01-03",
+        "test_calendar_end": "2025-12-31",
+        "prediction_days": 752,
+        "test_calendar_days": 752,
+        "calendar_source": "native Qlib report index from the same declared test split",
+        "complete": true
+      }
+    }
+  },
   "run_selection": "latest FINISHED MLflow run with prediction, label, and daily backtest artifacts for each market/seed",
-  "git_commit": "6117797586604d89142e6ffe66158872db5e8bca"
+  "portfolio_metric_source": "fresh standard Qlib backtest from each selected prediction; native MLflow backtest retained for traceability only",
+  "git_commit": "2124e11e661a51cc1813d5965c43903f1298f21f"
 }

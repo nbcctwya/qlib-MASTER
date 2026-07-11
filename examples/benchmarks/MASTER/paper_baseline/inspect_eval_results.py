@@ -66,6 +66,28 @@ def main() -> None:
         if "*" not in relative:
             validator.check(f"manifest file: {name}", (root / relative).is_file(), relative)
 
+    standard = config.get("standard_backtest", {})
+    strategy = standard.get("strategy", {})
+    kwargs = strategy.get("kwargs", {})
+    expected_strategy = {
+        "topk": 30, "n_drop": 5, "method_sell": "bottom", "method_buy": "top",
+        "hold_thresh": 1, "only_tradable": False, "forbid_all_trade_at_limit": True,
+        "risk_degree": 0.95,
+    }
+    strategy_ok = (
+        strategy.get("class") == "TopkDropoutStrategy"
+        and kwargs == expected_strategy
+        and standard.get("frequency") == "day"
+        and standard.get("account") == 100000000
+        and standard.get("costs") == {"open_cost": 0.0005, "close_cost": 0.0015, "min_cost": 0}
+        and standard.get("deal_price") == "close"
+        and set(standard.get("applies_to", [])) == {"seed", "ensemble"}
+    )
+    validator.check("standard Qlib backtest configuration", strategy_ok, "all fixed strategy, account, frequency, and cost parameters are explicit")
+    alignment = config.get("signal_alignment", {})
+    alignment_ok = alignment.get("signal_date") == "t-1" and alignment.get("trade_date") == "t" and alignment.get("qlib_internal_shift") == 1 and alignment.get("manual_shift_applied") is False
+    validator.check("signal timing convention", alignment_ok, "trade t uses Qlib shift=1 signal from t-1 without manual shifting")
+
     seed = pd.read_csv(root / manifest["files"]["seed_metrics"])
     expected_keys = {(market, "master", int(value)) for market, values in config["seeds"].items() for value in values}
     actual_keys = set(seed[["market", "model", "seed"]].itertuples(index=False, name=None))
@@ -75,6 +97,20 @@ def main() -> None:
     validator.check("seed metrics finite", np.isfinite(numeric.to_numpy()).all(), "no allowed undefined exceptions in this export")
     bounds = (seed["IC"].abs() <= 1).all() and (seed["RankIC"].abs() <= 1).all() and (seed["STD"] >= 0).all() and (seed["MDD"] <= 0).all()
     validator.check("seed metric bounds", bounds, "|IC|, |RankIC| <= 1; STD >= 0; MDD <= 0")
+    coverage_ok = True
+    repo_root = Path(__file__).resolve().parents[4]
+    for market, seed_artifacts in config["selected_artifacts"].items():
+        for seed_value, artifacts in seed_artifacts.items():
+            pred = load_series(repo_root / artifacts["prediction"])
+            dates = pd.DatetimeIndex(pred.index.get_level_values("datetime").unique()).sort_values()
+            coverage = config["prediction_coverage"][market][seed_value]
+            coverage_ok &= (
+                coverage["complete"] is True
+                and len(dates) == coverage["test_calendar_days"] == coverage["prediction_days"]
+                and str(dates.min().date()) == coverage["test_calendar_start"] == coverage["prediction_start"]
+                and str(dates.max().date()) == coverage["test_calendar_end"] == coverage["prediction_end"]
+            )
+    validator.check("prediction test-calendar coverage", coverage_ok, "every seed exactly covers its market's declared Qlib test calendar")
 
     actual_aggregate = pd.read_csv(root / manifest["files"]["aggregate_metrics"])
     expected_aggregate = aggregate(seed)
@@ -92,7 +128,6 @@ def main() -> None:
         for metric in METRICS:
             table_ok &= np.allclose(table[metric].astype(float), ensemble[metric], atol=5.1e-5, rtol=0)
         validator.check("ensemble table formatting", table_ok, "four-decimal numeric display")
-        repo_root = Path(__file__).resolve().parents[4]
         for row in ensemble.itertuples(index=False):
             curve_path = root / f"curves/ensemble/{row.market}_{row.model}.csv"
             curve = pd.read_csv(curve_path, parse_dates=["datetime"])

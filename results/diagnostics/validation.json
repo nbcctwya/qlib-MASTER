@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "passes": 24,
+  "passes": 27,
   "failures": 0,
   "checks": [
     {
@@ -44,6 +44,16 @@
       "detail": "tables/ensemble.csv"
     },
     {
+      "name": "standard Qlib backtest configuration",
+      "passed": true,
+      "detail": "all fixed strategy, account, frequency, and cost parameters are explicit"
+    },
+    {
+      "name": "signal timing convention",
+      "passed": true,
+      "detail": "trade t uses Qlib shift=1 signal from t-1 without manual shifting"
+    },
+    {
       "name": "seed key coverage",
       "passed": true,
       "detail": "expected=[('csi300', 'master', 0), ('csi300', 'master', 1), ('csi300', 'master', 2), ('csi300', 'master', 3), ('csi300', 'master', 4), ('sp500', 'master', 0), ('sp500', 'master', 1), ('sp500', 'master', 2), ('sp500', 'master', 3), ('sp500', 'master', 4)], actual=[('csi300', 'master', 0), ('csi300', 'master', 1), ('csi300', 'master', 2), ('csi300', 'master', 3), ('csi300', 'master', 4), ('sp500', 'master', 0), ('sp500', 'master', 1), ('sp500', 'master', 2), ('sp500', 'master', 3), ('sp500', 'master', 4)]"
@@ -62,6 +72,11 @@
       "name": "seed metric bounds",
       "passed": true,
       "detail": "|IC|, |RankIC| <= 1; STD >= 0; MDD <= 0"
+    },
+    {
+      "name": "prediction test-calendar coverage",
+      "passed": true,
+      "detail": "every seed exactly covers its market's declared Qlib test calendar"
     },
     {
       "name": "aggregate recomputation",
