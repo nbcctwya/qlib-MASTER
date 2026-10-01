@@ -131,7 +131,10 @@ class Index:
         if self.idx_list.dtype.type is np.datetime64:
             if isinstance(item, pd.Timestamp):
                 # This happens often when creating index based on pandas.DatetimeIndex and query with pd.Timestamp
-                return item.to_numpy()
+                return item.to_numpy().astype(self.idx_list.dtype)
+            elif isinstance(item, np.datetime64):
+                # This happens often when creating index based on np.datetime64 and query with another precision
+                return item.astype(self.idx_list.dtype)
         return item
 
     def index(self, item) -> int:

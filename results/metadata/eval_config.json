@@ -325,5 +325,5 @@
   },
   "run_selection": "latest FINISHED MLflow run with prediction, label, and daily backtest artifacts for each market/seed",
   "portfolio_metric_source": "fresh standard Qlib backtest from each selected prediction; native MLflow backtest retained for traceability only",
-  "git_commit": "2124e11e661a51cc1813d5965c43903f1298f21f"
+  "git_commit": "ea4f8c016889d8e90902ea48d0df2dc06178149a"
 }
